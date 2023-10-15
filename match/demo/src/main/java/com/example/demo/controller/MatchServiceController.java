@@ -14,6 +14,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.client.RestTemplate;
+import org.springframework.core.env.Environment;
 
 
 import java.util.Arrays;
@@ -25,6 +26,9 @@ import java.util.Map;
 @Service
 @RequestMapping("/matches")
 public class MatchServiceController {
+    @Autowired
+    Environment environment;
+
     @Autowired
     RestTemplate restTemplate;
     private static final Map<Integer, Match> matchData = new HashMap<Integer, Match>() {
@@ -190,9 +194,20 @@ public class MatchServiceController {
         return playerStats;
     }
 
+    @GetMapping("/backend")
+    public String backend() {
+        System.out.println("Inside MyRestController::backend...");
+
+        String serverPort = environment.getProperty("local.server.port");
+
+        System.out.println("Port : " + serverPort);
+
+        return "Hello form Backend!!! " + " Host : localhost " + " :: Port : " + serverPort;
+    }
+
+
 
     @Bean
-    @LoadBalanced
     public RestTemplate restTemplate() {
         return new RestTemplate();
     }

@@ -22,6 +22,12 @@ import java.util.Map;
 @RestController
 @RequestMapping("/stats")
 public class StatsServiceController {
+    @LoadBalanced
+    @Bean
+    RestTemplate restTemplate() {
+        return new RestTemplate();
+    }
+
     @Autowired
     RestTemplate restTemplate;
 
@@ -87,9 +93,12 @@ public class StatsServiceController {
         return new PlayerStats(playerId, -2);
     }
 
-    @Bean
-    @LoadBalanced
-    public RestTemplate restTemplate() {
-        return new RestTemplate();
+
+    @RequestMapping("/ribbon")
+    public String hi() {
+        String randomString = this.restTemplate.getForObject("http://matchService/matches/backend", String.class);
+        return "Server Response :: " + randomString;
     }
+
+
 }
