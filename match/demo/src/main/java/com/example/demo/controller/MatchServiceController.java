@@ -1,8 +1,6 @@
 package com.example.demo.controller;
 
-import com.example.demo.beans.Match;
-import com.example.demo.beans.Player;
-import com.example.demo.beans.Team;
+import com.example.demo.beans.*;
 import com.netflix.hystrix.contrib.javanica.annotation.HystrixCommand;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -146,13 +144,13 @@ public class MatchServiceController {
         return "Success!";
     }
 
-    @ApiOperation(value = "Get the number of matches won by a team", response = Integer.class)
+    @ApiOperation(value = "Get the number of matches won by a team", response = TeamStats.class)
     @ApiResponses(value = {
-            @ApiResponse(code = 200, message = "Count of matches won retrieved successfully"),
+            @ApiResponse(code = 200, message = "Team stats retrieved successfully"),
             @ApiResponse(code = 404, message = "Team not found"),
     })
     @GetMapping("/team/{teamId}")
-    public int getMatchesWonByTeam(@PathVariable int teamId) {
+    public TeamStats getMatchesWonByTeam(@PathVariable int teamId) {
         int wonMatchesCount = 0;
 
         for (Match match : matchData.values()) {
@@ -160,15 +158,18 @@ public class MatchServiceController {
                 wonMatchesCount++;
             }
         }
-        return wonMatchesCount;
+
+        // Create a TeamStats object and return it
+        return new TeamStats(teamId, wonMatchesCount);
     }
-    @ApiOperation(value = "Get the number of goals scored by a player", response = Integer.class)
+
+    @ApiOperation(value = "Get the number of goals scored by a player", response = PlayerStats.class)
     @ApiResponses(value = {
-            @ApiResponse(code = 200, message = "Number of goals scored retrieved successfully"),
+            @ApiResponse(code = 200, message = "Player stats retrieved successfully"),
             @ApiResponse(code = 404, message = "Player not found"),
     })
     @GetMapping("/player/{playerId}")
-    public int getGoalsScoredByPlayer(@PathVariable int playerId) {
+    public PlayerStats getGoalsScoredByPlayer(@PathVariable int playerId) {
         int goalsScoredCount = 0;
 
         for (Match match : matchData.values()) {
@@ -181,8 +182,14 @@ public class MatchServiceController {
             }
         }
 
-        return goalsScoredCount;
+        // Create a PlayerStats object and return it
+        PlayerStats playerStats = new PlayerStats();
+        playerStats.setPlayerId(playerId);
+        playerStats.setGoalsScored(goalsScoredCount);
+
+        return playerStats;
     }
+
 
     @Bean
     @LoadBalanced
