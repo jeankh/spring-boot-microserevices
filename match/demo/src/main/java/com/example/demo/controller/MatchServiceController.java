@@ -145,6 +145,45 @@ public class MatchServiceController {
         matchData.remove(id);
         return "Success!";
     }
+
+    @ApiOperation(value = "Get the number of matches won by a team", response = Integer.class)
+    @ApiResponses(value = {
+            @ApiResponse(code = 200, message = "Count of matches won retrieved successfully"),
+            @ApiResponse(code = 404, message = "Team not found"),
+    })
+    @GetMapping("/team/{teamId}")
+    public int getMatchesWonByTeam(@PathVariable int teamId) {
+        int wonMatchesCount = 0;
+
+        for (Match match : matchData.values()) {
+            if (match.getWinner() != null && match.getWinner().getId() == teamId) {
+                wonMatchesCount++;
+            }
+        }
+        return wonMatchesCount;
+    }
+    @ApiOperation(value = "Get the number of goals scored by a player", response = Integer.class)
+    @ApiResponses(value = {
+            @ApiResponse(code = 200, message = "Number of goals scored retrieved successfully"),
+            @ApiResponse(code = 404, message = "Player not found"),
+    })
+    @GetMapping("/player/{playerId}")
+    public int getGoalsScoredByPlayer(@PathVariable int playerId) {
+        int goalsScoredCount = 0;
+
+        for (Match match : matchData.values()) {
+            if (match.getScorers() != null) {
+                for (Player player : match.getScorers()) {
+                    if (player.getId() == playerId) {
+                        goalsScoredCount++;
+                    }
+                }
+            }
+        }
+
+        return goalsScoredCount;
+    }
+
     @Bean
     @LoadBalanced
     public RestTemplate restTemplate() {
